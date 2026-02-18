@@ -1,0 +1,28 @@
+{
+  "name": "koders-backend",
+  "version": "1.0.0",
+  "description": " This is the backend for Task Management Platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sid2303/koders-backend.git"
+  },
+  "author": "Siddhant Rawat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sid2303/koders-backend/issues"
+  },
+  "homepage": "https://github.com/Sid2303/koders-backend#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
