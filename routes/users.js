@@ -65,20 +65,6 @@ router.put("/:id", auth, async (req, res, next) => {
   }
 });
 
-router.get("/user-name/:id", auth, async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-    res.status(200).json({ username: user.username });
-  } catch (err) {
-    next(err);
-  }
-});
-
 router.delete("/:id", auth, async (req, res, next) => {
   try {
     const requestingUser = await User.findById(req.user.id);

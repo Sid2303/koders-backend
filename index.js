@@ -16,7 +16,6 @@ const app = express();
 //Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(errorHandler);
 
 //Routes
 app.use("/api/register", registerationRoute);
@@ -30,6 +29,8 @@ app.get("/", (req, res) => {
     message: "Hello, World!",
   });
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 connectDatabase();
