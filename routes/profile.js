@@ -5,7 +5,7 @@ import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.put("/update-profile", auth, async (req, res) => {
+router.put("/update-profile", auth, async (req, res, next) => {
   try {
     const { username, email } = req.body;
 
@@ -47,14 +47,11 @@ router.put("/update-profile", auth, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.post("/change-password", auth, async (req, res) => {
+router.post("/change-password", auth, async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
@@ -92,10 +89,7 @@ router.post("/change-password", auth, async (req, res) => {
       message: "Password changed successfully",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 

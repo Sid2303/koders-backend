@@ -7,14 +7,18 @@ import loginRoute from "./routes/login.js";
 import tasksRoute from "./routes/tasks.js";
 import usersRoute from "./routes/users.js";
 import profileRoute from "./routes/profile.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
 
 const app = express();
 
+//Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(errorHandler);
 
+//Routes
 app.use("/api/register", registerationRoute);
 app.use("/api/login", loginRoute);
 app.use("/api/tasks", tasksRoute);

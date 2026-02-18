@@ -1,10 +1,11 @@
 import express from "express";
 import User from "../models/User.js";
+import Task from "../models/Task.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, async (req, res, next) => {
   try {
     const users = await User.find().select("-password");
 
@@ -12,14 +13,11 @@ router.get("/", auth, async (req, res) => {
       users,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
 
@@ -31,14 +29,11 @@ router.get("/:id", auth, async (req, res) => {
 
     res.status(200).json({ user });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, async (req, res, next) => {
   try {
     const { username, email, role } = req.body;
 
@@ -66,16 +61,41 @@ router.put("/:id", auth, async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.delete("/:id", auth, async (req, res) => {
+router.get("/user-name/:id", auth, async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.status(200).json({ username: user.username });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete("/:id", auth, async (req, res, next) => {
+  try {
+    const requestingUser = await User.findById(req.user.id);
+
+    if (!requestingUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (requestingUser.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Only admin can delete users",
+      });
+    }
+
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({
@@ -83,14 +103,15 @@ router.delete("/:id", auth, async (req, res) => {
       });
     }
 
+    await Task.deleteMany({ assignedTo: req.params.id });
+
+    await User.findByIdAndDelete(req.params.id);
+
     res.status(200).json({
       message: "User deleted successfully",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 

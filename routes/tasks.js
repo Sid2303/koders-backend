@@ -1,25 +1,39 @@
 import express from "express";
 import Task from "../models/Task.js";
+import User from "../models/User.js";
 import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, async (req, res, next) => {
   try {
-    const tasks = await Task.find();
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    let tasks;
+
+    if (user.role === "admin" || user.role === "manager") {
+      tasks = await Task.find();
+    } else {
+      tasks = await Task.find({
+        $or: [{ createdBy: req.user.id }, { assignedTo: req.user.id }],
+      });
+    }
 
     res.status(200).json({
       tasks,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", auth, async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -31,14 +45,11 @@ router.get("/:id", auth, async (req, res) => {
 
     res.status(200).json({ task });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     const { title, description, status, priority, assignedTo, dueDate, tags } =
       req.body;
@@ -65,14 +76,11 @@ router.post("/", auth, async (req, res) => {
       task,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, async (req, res, next) => {
   try {
     const { title, description, status, priority, assignedTo, dueDate, tags } =
       req.body;
@@ -100,15 +108,26 @@ router.put("/:id", auth, async (req, res) => {
       task,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, async (req, res, next) => {
   try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== "admin" && user.role !== "manager") {
+      return res.status(403).json({
+        message: "Access denied. Only admin or manager can delete tasks",
+      });
+    }
+
     const task = await Task.findByIdAndDelete(req.params.id);
 
     if (!task) {
@@ -121,10 +140,7 @@ router.delete("/:id", auth, async (req, res) => {
       message: "Task deleted successfully",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Server error",
-    });
+    next(err);
   }
 });
 
