@@ -128,7 +128,11 @@ router.delete("/:id", auth, async (req, res, next) => {
       });
     }
 
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { deleted: true },
+      { new: true },
+    );
 
     if (!task) {
       return res.status(404).json({
@@ -138,6 +142,7 @@ router.delete("/:id", auth, async (req, res, next) => {
 
     res.status(200).json({
       message: "Task deleted successfully",
+      task,
     });
   } catch (err) {
     next(err);

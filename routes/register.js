@@ -47,13 +47,23 @@ router.post("/", async (req, res, next) => {
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "3d",
+        expiresIn: "15m",
       },
     );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
 
     res.status(201).json({
       message: "Registration successful",
       token,
+      refreshToken,
       user: {
         id: user._id,
         username: user.username,

@@ -38,6 +38,11 @@ const taskSchema = new mongoose.Schema(
       type: Date,
     },
 
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
+
     tags: [
       {
         type: String,

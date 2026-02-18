@@ -7,6 +7,7 @@ import loginRoute from "./routes/login.js";
 import tasksRoute from "./routes/tasks.js";
 import usersRoute from "./routes/users.js";
 import profileRoute from "./routes/profile.js";
+import tokenRoute from "./routes/token.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use("/api/login", loginRoute);
 app.use("/api/tasks", tasksRoute);
 app.use("/api/users", usersRoute);
 app.use("/api", profileRoute);
+app.use("/api", tokenRoute);
 
 app.get("/", (req, res) => {
   res.json({
