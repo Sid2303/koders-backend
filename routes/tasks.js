@@ -79,6 +79,9 @@ router.post("/", auth, async (req, res, next) => {
       tags,
     });
 
+    const io = req.app.get("io");
+    if (io) io.emit("task:created", task);
+
     res.status(201).json({
       message: "Task created successfully",
       task,
@@ -110,6 +113,9 @@ router.put("/:id", auth, async (req, res, next) => {
     if (tags) task.tags = tags;
 
     await task.save();
+
+    const io = req.app.get("io");
+    if (io) io.emit("task:updated", task);
 
     res.status(200).json({
       message: "Task updated successfully",
@@ -147,6 +153,9 @@ router.delete("/:id", auth, async (req, res, next) => {
         message: "Task not found",
       });
     }
+
+    const io = req.app.get("io");
+    if (io) io.emit("task:deleted", task);
 
     res.status(200).json({
       message: "Task deleted successfully",

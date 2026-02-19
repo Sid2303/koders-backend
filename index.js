@@ -1,4 +1,6 @@
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDatabase from "./config/database.js";
@@ -13,6 +15,22 @@ import errorHandler from "./middleware/errorHandler.js";
 dotenv.config();
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 //Middlewares
 app.use(cors());
@@ -37,6 +55,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 connectDatabase();
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
