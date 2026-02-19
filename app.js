@@ -7,6 +7,7 @@ import tasksRoute from "./routes/tasks.js";
 import usersRoute from "./routes/users.js";
 import profileRoute from "./routes/profile.js";
 import tokenRoute from "./routes/token.js";
+import forgotPasswordRoute from "./routes/forgotPassword.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -34,10 +35,12 @@ if (!isTest) {
   app.use("/api", generalLimiter);
   app.use("/api/register", authLimiter);
   app.use("/api/login", authLimiter);
+  app.use("/api/forgot-password", authLimiter);
 }
 
 app.use("/api/register", registerationRoute);
 app.use("/api/login", loginRoute);
+app.use("/api/forgot-password", forgotPasswordRoute);
 app.use("/api/tasks", tasksRoute);
 app.use("/api/users", usersRoute);
 app.use("/api", profileRoute);
