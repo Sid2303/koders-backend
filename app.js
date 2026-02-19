@@ -22,13 +22,13 @@ const isTest = process.env.NODE_ENV === "test";
 if (!isTest) {
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
     message: { message: "Too many requests, please try again later" },
   });
 
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 100,
     message: { message: "Too many login attempts, please try again later" },
   });
 

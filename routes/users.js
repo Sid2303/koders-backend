@@ -77,7 +77,7 @@ router.delete("/:id", auth, async (req, res, next) => {
 
     if (requestingUser.role !== "admin") {
       return res.status(403).json({
-        message: "Access denied. Only admin can delete users",
+        message: "Restricted",
       });
     }
 

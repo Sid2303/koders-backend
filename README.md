@@ -8,6 +8,29 @@ Live link: https://koders-backend.onrender.com
 
 ---
 
+## Architecture
+
+```mermaid
+graph TD
+    Client["Frontend (React + Vite)"]
+
+    subgraph Backend ["Backend (Express)"]
+        MW["Middleware\nCORS · JWT Auth · Rate Limiter · Error Handler"]
+        Routes["Routes\n/api/register · /api/login · /api/tasks\n/api/users · /api/update-profile\n/api/change-password · /api/refresh-token\n/api/logout · /api/forgot-password"]
+        Sockets["Socket.IO\ntask:created · task:updated · task:deleted"]
+    end
+
+    DB["MongoDB Atlas"]
+
+    Client -- "HTTP REST" --> Routes
+    Client -- "WebSocket" --> Sockets
+    Routes --> MW
+    MW --> DB
+    Sockets --> DB
+```
+
+---
+
 ## How to run it
 
 First clone the repo and install packages:
