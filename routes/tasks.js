@@ -15,15 +15,23 @@ router.get("/", auth, async (req, res, next) => {
       });
     }
 
-    let tasks;
+    const { status, priority, assignedTo, deleted, sortBy, order } = req.query;
 
-    if (user.role === "admin" || user.role === "manager") {
-      tasks = await Task.find();
-    } else {
-      tasks = await Task.find({
-        $or: [{ createdBy: req.user.id }, { assignedTo: req.user.id }],
-      });
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (priority) filter.priority = priority;
+    if (assignedTo) filter.assignedTo = assignedTo;
+    if (deleted !== undefined) filter.deleted = deleted === "true";
+
+    if (user.role !== "admin" && user.role !== "manager") {
+      filter.$or = [{ createdBy: req.user.id }, { assignedTo: req.user.id }];
     }
+
+    const sortOrder = order === "desc" ? -1 : 1;
+    const sortField = sortBy || "createdAt";
+
+    const tasks = await Task.find(filter).sort({ [sortField]: sortOrder });
 
     res.status(200).json({
       tasks,
